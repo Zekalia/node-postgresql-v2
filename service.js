@@ -77,6 +77,28 @@ app.get('/api/:id', (req, res) => {
     );
   });
 
+  app.get('/api/cabang/:id', (req, res) => {
+    const { id } = req.params;
+  
+    pool.query(
+      'SELECT nama_cabang FROM tvkurs_crud WHERE id = $1',
+      [id],
+      (error, result) => {
+        if (error) {
+          console.error('Error executing query:', error);
+          res.status(500).json({ error: 'An error occurred while fetching data.' });
+        } else {
+          if (result.rows.length === 0) {
+            res.status(404).json({ message: 'Data not found' });
+          } else {
+            const data = result.rows[0];
+            res.json(data);
+          }
+        }
+      }
+    );
+  });
+
 app.post('/api/data', (req, res) => {
     const { nama_cabang, video_url, jam_buka, jam_tutup } = req.body; // Assuming you're inserting these fields
     const sequence_name = "nextval('TVKURS_CRUD_ID_SEQ')";
