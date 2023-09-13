@@ -128,3 +128,23 @@ app.delete('/api/data/:id', (req, res) => {
       }
     });
 });
+
+app.put('/api/updateData/:id', async (req, res) => {
+  const { id } = req.params;
+  const { nama_cabang, video_url, jam_buka, jam_tutup } = req.body;
+
+  try {
+    const client = await pool.connect();
+
+    // Update user data in the database
+    const updateQuery = 'UPDATE tvkurs_crud SET nama_cabang = $1, video_url = $2, jam_buka = $3, jam_tutup = $4 WHERE id = $5';
+    const values = [nama_cabang, video_url, jam_buka, jam_tutup, id];
+    await client.query(updateQuery, values);
+
+    client.release();
+    res.json({ message: 'User updated successfully' });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
