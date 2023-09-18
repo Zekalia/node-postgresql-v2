@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const cors = require('cors');
 const { Pool } = require('pg');
 
@@ -16,6 +17,7 @@ const pool = new Pool({
     password: 'Golanggabut@123',
     port: 5432,
 });
+app.use(express.json());
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
@@ -146,5 +148,23 @@ app.put('/api/updateData/:id', async (req, res) => {
   } catch (error) {
     console.error('Error updating user:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.post('/api/uploadKonten', upload.single('video'), async (req, res) => {
+  try {
+    const { title } = req.body;
+    const videoPath = req.file.path; // Path to the uploaded video file
+
+    // Store video metadata in the database
+    const insertQuery = 'INSERT INTO video_konten_tvkurs (title, path) VALUES ($1, $2)';
+    const values = [title, videoPath];
+    const { rows } = await pool.query(insertQuery, values);
+
+    res.json({ success: true, video: rows[0] });
+  } catch (error) {
+    console.error('Error uploading video:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 });
