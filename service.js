@@ -1,8 +1,9 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const multer = require('multer');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const { Pool } = require('pg');
+const upload = multer({ dest: 'uploads/' });
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -158,7 +159,7 @@ app.post('/api/uploadKonten', upload.single('video'), async (req, res) => {
     const videoPath = req.file.path; // Path to the uploaded video file
 
     // Store video metadata in the database
-    const insertQuery = 'INSERT INTO video_konten_tvkurs (title, path) VALUES ($1, $2)';
+    const insertQuery = 'INSERT INTO video_konten_tvkurs (video_title, path) VALUES ($1, $2) RETURNING *';
     const values = [title, videoPath];
     const { rows } = await pool.query(insertQuery, values);
 
